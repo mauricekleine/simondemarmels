@@ -23,18 +23,21 @@ handler.post(async (req, res) => {
     );
 
     if (!currentRoundsBet) {
-      return Promise.resolve();
-    }
-
-    if (outcome === "loss") {
-      participant.balance =
-        Math.round((participant.balance - currentRoundsBet.amount) * 100) / 100;
-    }
-
-    if (outcome === "win") {
-      participant.balance =
-        Math.round((participant.balance + currentRoundsBet.amount * 7) * 100) /
-        100;
+      participant.bets.push({
+        amount: -1,
+        round: experiment.currentRound,
+      });
+    } else {
+      if (outcome === "loss") {
+        participant.balance =
+          Math.round((participant.balance - currentRoundsBet.amount) * 100) /
+          100;
+      } else if (outcome === "win") {
+        participant.balance =
+          Math.round(
+            (participant.balance + currentRoundsBet.amount * 7) * 100
+          ) / 100;
+      }
     }
 
     return participant.save();
