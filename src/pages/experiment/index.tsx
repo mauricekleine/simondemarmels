@@ -70,9 +70,11 @@ const ExperimentPage = () => {
     pData?.participant?.bets.length === 4;
 
   if (hasFinished) {
-    <div className="flex flex-col h-screen items-center justify-center space-y-8 w-screen">
-      It's a wrap. Thanks for participating!
-    </div>;
+    return (
+      <div className="flex flex-col h-screen items-center justify-center space-y-8 w-screen">
+        It's a wrap. Thanks for participating!
+      </div>
+    );
   }
 
   return (
