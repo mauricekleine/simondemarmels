@@ -72,9 +72,11 @@ const ExperimentPage = () => {
   if (hasFinished) {
     return (
       <div className="flex flex-col h-screen items-center justify-center space-y-8 w-screen">
-        It's a wrap. Your participant ID is{" "}
-        <span className="font-bold">{pData.participant.pid}</span>. Thanks for
-        participating!
+        <p>
+          It's a wrap. Your participant ID is{" "}
+          <span className="font-bold">{pData.participant.pid}</span>. Thanks for
+          participating!
+        </p>
       </div>
     );
   }

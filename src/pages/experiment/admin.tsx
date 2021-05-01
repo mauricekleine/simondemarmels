@@ -1,11 +1,20 @@
 import { useCallback } from "react";
 import useSWR from "swr";
+import { Experiment } from "../../models/experiment";
 import { Participant } from "../../models/participant";
 import fetcher from "../../utils/fetcher";
 
 const ExperimentAdminPage = () => {
   const { data, mutate } = useSWR<{ participants: Participant[] }>(
     "/api/participants",
+    fetcher,
+    {
+      refreshInterval: 1000,
+    }
+  );
+
+  const { data: eData } = useSWR<{ experiment: Experiment }>(
+    "/api/experiment",
     fetcher,
     {
       refreshInterval: 1000,
@@ -43,6 +52,8 @@ const ExperimentAdminPage = () => {
 
   return (
     <div className="p-8">
+      <p>Current round #{eData?.experiment?.currentRound}</p>
+
       <div className="flex mb-4 space-x-2">
         <button
           className="bg-green-400 border px-4 py-2 rounded text-white hover:bg-green-300"
