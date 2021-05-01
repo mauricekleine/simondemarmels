@@ -1,8 +1,8 @@
-import { useCallback } from "react";
 import useSWR from "swr";
 import { Experiment } from "../../models/experiment";
 import { Participant } from "../../models/participant";
 import fetcher from "../../utils/fetcher";
+import classnames from "classnames";
 
 const ExperimentAdminPage = () => {
   const { data, mutate } = useSWR<{ participants: Participant[] }>(
@@ -50,20 +50,42 @@ const ExperimentAdminPage = () => {
     }
   };
 
+  const isLastRound = eData?.experiment?.currentRound === 5;
+
   return (
     <div className="p-8">
-      <p>Current round #{eData?.experiment?.currentRound}</p>
+      <p className="font-bold">
+        {isLastRound ? (
+          "It's a wrap"
+        ) : (
+          <>Current round: #{eData?.experiment?.currentRound}</>
+        )}
+      </p>
 
       <div className="flex mb-4 space-x-2">
         <button
-          className="bg-green-400 border px-4 py-2 rounded text-white hover:bg-green-300"
+          className={classnames(
+            " border px-4 py-2 rounded text-white hover:bg-green-300",
+            {
+              "bg-green-300 cursor-default": isLastRound,
+              "bg-green-400 cursor-pointer": !isLastRound,
+            }
+          )}
+          disabled={isLastRound}
           onClick={() => handleSubmit("win")}
         >
           It's a win
         </button>
 
         <button
-          className="bg-red-400 border px-4 py-2 rounded text-white hover:bg-red-300"
+          className={classnames(
+            "border px-4 py-2 rounded text-white hover:bg-red-300",
+            {
+              "bg-red-300 cursor-default": isLastRound,
+              "bg-red-400 cursor-pointer": !isLastRound,
+            }
+          )}
+          disabled={isLastRound}
           onClick={() => handleSubmit("loss")}
         >
           It's a loss

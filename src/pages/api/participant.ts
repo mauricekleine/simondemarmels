@@ -47,14 +47,45 @@ handler.post<ExtendedNextApiRequest>(async (req, res) => {
 
     result = await participant.save();
   } else {
-    const participant: Participant = {
-      balance: 20,
-      bets: [
+    const bets = [];
+
+    if (experiment.currentRound === 1) {
+      bets.push({
+        amount,
+        round: experiment.currentRound,
+      });
+    } else if (experiment.currentRound === 2) {
+      bets.push(
+        { amount: -1, round: experiment.currentRound - 1 },
         {
           amount,
           round: experiment.currentRound,
-        },
-      ],
+        }
+      );
+    } else if (experiment.currentRound === 3) {
+      bets.push(
+        { amount: -1, round: experiment.currentRound - 2 },
+        { amount: -1, round: experiment.currentRound - 1 },
+        {
+          amount,
+          round: experiment.currentRound,
+        }
+      );
+    } else if (experiment.currentRound === 4) {
+      bets.push(
+        { amount: -1, round: experiment.currentRound - 3 },
+        { amount: -1, round: experiment.currentRound - 2 },
+        { amount: -1, round: experiment.currentRound - 1 },
+        {
+          amount,
+          round: experiment.currentRound,
+        }
+      );
+    }
+
+    const participant: Participant = {
+      balance: 20,
+      bets,
       group: Math.random() < 0.5 ? "paper" : "realization",
       pid,
     };

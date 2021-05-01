@@ -46,7 +46,7 @@ handler.post(async (req, res) => {
   await Promise.allSettled(promises);
 
   experiment.currentRound =
-    experiment.currentRound === 4 ? 4 : experiment.currentRound + 1;
+    experiment.currentRound === 5 ? 5 : experiment.currentRound + 1;
 
   const result = await experiment.save();
 

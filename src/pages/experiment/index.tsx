@@ -66,7 +66,7 @@ const ExperimentPage = () => {
     pData?.participant?.bets.length === data?.experiment.currentRound;
 
   const hasFinished =
-    data?.experiment.currentRound === 4 &&
+    data?.experiment.currentRound === 5 ||
     pData?.participant?.bets.length === 4;
 
   if (hasFinished) {
@@ -74,8 +74,8 @@ const ExperimentPage = () => {
       <div className="flex flex-col h-screen items-center justify-center space-y-8 w-screen">
         <p>
           It's a wrap. Your participant ID is{" "}
-          <span className="font-bold">{pData.participant.pid}</span>. Thanks for
-          participating!
+          <span className="font-bold">{pData?.participant.pid}</span>. Thanks
+          for participating!
         </p>
       </div>
     );
