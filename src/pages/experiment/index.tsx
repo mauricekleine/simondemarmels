@@ -4,6 +4,7 @@ import useSWR from "swr";
 
 import { Participant, ParticipantGroup } from "../../types/participants";
 import fetcher from "../../utils/fetcher";
+import { round } from "../../utils/math";
 
 import "rc-slider/assets/index.css";
 
@@ -103,7 +104,7 @@ const ExperimentPage = () => {
             {participant?.group === ParticipantGroup.REALIZATION ? (
               <span>
                 Your account has been settled. Your remaining balance is{" "}
-                {Math.round(data.participant.balance * 100) / 100}.
+                {round(data.participant.balance).toFixed(2)}.
               </span>
             ) : (
               <>
@@ -111,14 +112,14 @@ const ExperimentPage = () => {
                   {participant?.balance > 20 && (
                     <span>
                       So far, you&apos;ve earned{" "}
-                      {Math.round((participant?.balance - 20) * 100) / 100}.
+                      {round(participant?.balance - 20).toFixed(2)}.
                     </span>
                   )}
 
                   {participant?.balance < 20 && (
                     <span>
                       So far, you&apos;ve lost{" "}
-                      {Math.round((20 - participant?.balance) * 100) / 100}.
+                      {round(20 - participant?.balance).toFixed(2)}.
                     </span>
                   )}
 
