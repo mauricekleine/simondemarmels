@@ -99,7 +99,7 @@ const ExperimentPage = () => {
         </p>
 
         {participant?.bets.length === 3 && (
-          <p>
+          <div className="text-center">
             {participant?.group === ParticipantGroup.REALIZATION ? (
               <span>
                 Your account has been settled. Your remaining balance is{" "}
@@ -107,33 +107,35 @@ const ExperimentPage = () => {
               </span>
             ) : (
               <>
-                {participant?.balance > 20 && (
-                  <span>
-                    So far, you&apos;ve earned{" "}
-                    {Math.round((participant?.balance - 20) * 100) / 100}.
-                  </span>
-                )}
+                <p>
+                  {participant?.balance > 20 && (
+                    <span>
+                      So far, you&apos;ve earned{" "}
+                      {Math.round((participant?.balance - 20) * 100) / 100}.
+                    </span>
+                  )}
 
-                {participant?.balance < 20 && (
-                  <span>
-                    So far, you&apos;ve lost{" "}
-                    {Math.round((20 - participant?.balance) * 100) / 100}.
-                  </span>
-                )}
+                  {participant?.balance < 20 && (
+                    <span>
+                      So far, you&apos;ve lost{" "}
+                      {Math.round((20 - participant?.balance) * 100) / 100}.
+                    </span>
+                  )}
 
-                {participant?.balance === 20 && (
-                  <span>
-                    So far, you haven&apos;t earned or lost any money.
-                  </span>
-                )}
+                  {participant?.balance === 20 && (
+                    <span>
+                      So far, you haven&apos;t earned or lost any money.
+                    </span>
+                  )}
+                </p>
+
+                <p>
+                  To finalise your position up to this point, please click
+                  “Transfer” below. You will then move on to the last round
+                </p>
               </>
             )}
-
-            <span>
-              To finalise your position up to this point, please click
-              “Transfer” below. You will then move on to the last round
-            </span>
-          </p>
+          </div>
         )}
 
         <button
