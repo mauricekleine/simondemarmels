@@ -1,10 +1,11 @@
+import Slider, { SliderTooltip } from "rc-slider";
 import { useCallback, useEffect, useState } from "react";
 import useSWR from "swr";
-import { Experiment } from "../../models/experiment";
+
+import { Participant, ParticipantGroup } from "../../types/participants";
 import fetcher from "../../utils/fetcher";
+
 import "rc-slider/assets/index.css";
-import Slider, { SliderTooltip } from "rc-slider";
-import { Participant } from "../../models/participant";
 
 const handle = (props) => {
   const { value, dragging, index, ...restProps } = props;
@@ -12,7 +13,7 @@ const handle = (props) => {
   return (
     <SliderTooltip
       prefixCls="rc-slider-tooltip"
-      overlay={value}
+      overlay={value.toFixed(2)}
       visible={dragging}
       placement="top"
       key={index}
@@ -23,17 +24,20 @@ const handle = (props) => {
 };
 
 const ExperimentPage = () => {
+  const [id, setId] = useState(null);
   const [amount, setAmount] = useState(0);
-  const { data } = useSWR<{ experiment: Experiment }>(
-    "/api/experiment",
-    fetcher,
-    {
-      refreshInterval: 1000,
-    }
-  );
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const { data: pData, mutate } = useSWR<{ participant: Participant }>(
-    "/api/participant",
+  useEffect(() => {
+    const id = localStorage.getItem("id");
+
+    if (id) {
+      setId(id);
+    }
+  }, [setId]);
+
+  const { data, mutate } = useSWR<{ participant: Participant }>(
+    id ? `/api/participants/${id}` : null,
     fetcher
   );
 
@@ -45,124 +49,147 @@ const ExperimentPage = () => {
   );
 
   const handleSubmit = useCallback(async () => {
-    const response = await fetch("/api/participant", {
+    const url = id ? `/api/participants/${id}` : "/api/participants";
+    const method = id ? "PATCH" : "POST";
+
+    const response = await fetch(url, {
       body: JSON.stringify({
         amount,
       }),
-      credentials: "same-origin",
       headers: {
         ["Content-Type"]: "application/json",
       },
-      method: "POST",
+      method,
     });
 
-    const participant = await response.json();
+    const data = (await response.json()) as {
+      participant: Participant;
+    };
 
-    mutate(participant);
+    localStorage.setItem("id", data.participant._id);
+    mutate(data);
     setAmount(0);
-  }, [amount, data?.experiment.currentRound, mutate]);
+    setHasSubmitted(true);
+    setId(data.participant._id);
+  }, [amount, id, mutate]);
 
-  const hasSubmitted =
-    pData?.participant?.bets.length === data?.experiment.currentRound;
-
-  const hasFinished =
-    data?.experiment.currentRound === 5 ||
-    pData?.participant?.bets.length === 4;
+  const participant = id && data?.participant;
+  const hasFinished = participant?.bets.length === 4;
 
   if (hasFinished) {
     return (
-      <div className="flex flex-col h-screen items-center justify-center space-y-8 w-screen">
+      <div className="flex flex-col items-center justify-center w-screen h-screen space-y-8">
         <p>
-          It's a wrap. Your participant ID is{" "}
-          <span className="font-bold">{pData?.participant.pid}</span>. Thanks
-          for participating!
+          It&apos;s a wrap. Your participant ID is{" "}
+          <span className="font-bold">{participant?._id}</span>. Thanks for
+          participating!
         </p>
       </div>
     );
   }
 
-  return (
-    <div className="flex flex-col h-screen items-center justify-center space-y-8 w-screen">
-      {hasSubmitted ? (
-        <p>Waiting for the host to start the next round</p>
-      ) : (
-        <>
-          <p className="font-bold text-center text-lg">
-            Round {data?.experiment?.currentRound}
+  if (hasSubmitted) {
+    return (
+      <div className="flex flex-col items-center justify-center w-screen h-screen space-y-8">
+        <p>
+          Your last bet resulted in a{" "}
+          <span className="lowercase">
+            {participant?.bets[participant?.bets.length - 1].outcome}
+          </span>
+        </p>
+
+        {participant?.bets.length === 3 && (
+          <p>
+            {participant?.group === ParticipantGroup.REALIZATION ? (
+              <span>
+                Your account has been settled. Your remaining balance is{" "}
+                {Math.round(data.participant.balance * 100) / 100}.
+              </span>
+            ) : (
+              <>
+                {participant?.balance > 20 && (
+                  <span>
+                    So far, you&apos;ve earned{" "}
+                    {Math.round((participant?.balance - 20) * 100) / 100}.
+                  </span>
+                )}
+
+                {participant?.balance < 20 && (
+                  <span>
+                    So far, you&apos;ve lost{" "}
+                    {Math.round((20 - participant?.balance) * 100) / 100}.
+                  </span>
+                )}
+
+                {participant?.balance === 20 && (
+                  <span>
+                    So far, you haven&apos;t earned or lost any money.
+                  </span>
+                )}
+              </>
+            )}
+
+            <span>
+              To finalise your position up to this point, please click
+              “Transfer” below. You will then move on to the last round
+            </span>
           </p>
+        )}
 
-          {data?.experiment.currentRound === 4 && (
-            <p>
-              {pData?.participant?.group === "realization" ? (
-                <span>
-                  Your account has been settled. Your remaining balance is{" "}
-                  {Math.round(pData.participant.balance * 100) / 100}.
-                </span>
-              ) : (
-                <>
-                  {pData?.participant?.balance > 20 && (
-                    <span>
-                      So far, you've earned{" "}
-                      {Math.round((pData?.participant?.balance - 20) * 100) /
-                        100}
-                      .
-                    </span>
-                  )}
+        <button
+          className="px-4 py-2 border rounded hover:bg-gray-100"
+          onClick={() => setHasSubmitted(false)}
+        >
+          {participant?.bets.length === 3 &&
+          participant?.group === ParticipantGroup.PAPER
+            ? "Transfer"
+            : "Continue"}
+        </button>
+      </div>
+    );
+  }
 
-                  {pData?.participant?.balance < 20 && (
-                    <span>
-                      So far, you've lost{" "}
-                      {Math.round((20 - pData?.participant?.balance) * 100) /
-                        100}
-                      .
-                    </span>
-                  )}
+  return (
+    <div className="flex flex-col items-center justify-center w-screen h-screen space-y-8">
+      <>
+        <p className="text-lg font-bold text-center">
+          Round {participant ? participant.bets.length + 1 : 1}
+        </p>
 
-                  {pData?.participant?.balance === 20 && (
-                    <span>So far, haven't earned or lost any mony.</span>
-                  )}
-                </>
-              )}
+        <div className="w-6/12">
+          <Slider
+            dots
+            handle={handle}
+            marks={{
+              0: 0,
+              0.5: 0.5,
+              1: 1,
+              1.5: 1.5,
+              2: 2,
+              2.5: 2.5,
+              3: 3,
+              3.5: 3.5,
+              4: 4,
+              4.5: 4.5,
+              5: 5,
+            }}
+            max={5}
+            min={0}
+            onChange={handleSlider}
+            step={0.01}
+            value={amount}
+          />
+        </div>
 
-              <span> Please make your last investment</span>
-            </p>
-          )}
+        <p>Your bet: {amount.toFixed(2)}</p>
 
-          <div className="w-6/12">
-            <Slider
-              dots
-              handle={handle}
-              marks={{
-                0: 0,
-                0.5: 0.5,
-                1: 1,
-                1.5: 1.5,
-                2: 2,
-                2.5: 2.5,
-                3: 3,
-                3.5: 3.5,
-                4: 4,
-                4.5: 4.5,
-                5: 5,
-              }}
-              max={5}
-              min={0}
-              onChange={handleSlider}
-              step={0.01}
-              value={amount}
-            />
-          </div>
-
-          <p>Your bet: {amount}</p>
-
-          <button
-            className="border px-4 py-2 rounded hover:bg-gray-100"
-            onClick={handleSubmit}
-          >
-            Place bet
-          </button>
-        </>
-      )}
+        <button
+          className="px-4 py-2 border rounded hover:bg-gray-100"
+          onClick={handleSubmit}
+        >
+          Place bet
+        </button>
+      </>
     </div>
   );
 };

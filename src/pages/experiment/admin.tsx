@@ -1,8 +1,7 @@
 import useSWR from "swr";
-import { Experiment } from "../../models/experiment";
-import { Participant } from "../../models/participant";
+
+import { Participant } from "../../types/participants";
 import fetcher from "../../utils/fetcher";
-import classnames from "classnames";
 
 const ExperimentAdminPage = () => {
   const { data, mutate } = useSWR<{ participants: Participant[] }>(
@@ -12,27 +11,6 @@ const ExperimentAdminPage = () => {
       refreshInterval: 1000,
     }
   );
-
-  const { data: eData } = useSWR<{ experiment: Experiment }>(
-    "/api/experiment",
-    fetcher,
-    {
-      refreshInterval: 1000,
-    }
-  );
-
-  const handleSubmit = (outcome: "loss" | "win") => {
-    fetch("/api/experiment", {
-      body: JSON.stringify({
-        outcome,
-      }),
-      credentials: "same-origin",
-      headers: {
-        ["Content-Type"]: "application/json",
-      },
-      method: "POST",
-    });
-  };
 
   const handleReset = async () => {
     const isConfirmed = confirm("Are you sure? This cannot be undone.");
@@ -50,93 +28,48 @@ const ExperimentAdminPage = () => {
     }
   };
 
-  const isLastRound = eData?.experiment?.currentRound === 5;
+  if (!data?.participants) {
+    return <span>Loading...</span>;
+  }
 
   return (
     <div className="p-8">
-      <p className="font-bold">
-        {isLastRound ? (
-          "It's a wrap"
-        ) : (
-          <>Current round: #{eData?.experiment?.currentRound}</>
-        )}
-      </p>
-
       <div className="flex mb-4 space-x-2">
         <button
-          className={classnames(
-            " border px-4 py-2 rounded text-white hover:bg-green-300",
-            {
-              "bg-green-300 cursor-default": isLastRound,
-              "bg-green-400 cursor-pointer": !isLastRound,
-            }
-          )}
-          disabled={isLastRound}
-          onClick={() => handleSubmit("win")}
-        >
-          It's a win
-        </button>
-
-        <button
-          className={classnames(
-            "border px-4 py-2 rounded text-white hover:bg-red-300",
-            {
-              "bg-red-300 cursor-default": isLastRound,
-              "bg-red-400 cursor-pointer": !isLastRound,
-            }
-          )}
-          disabled={isLastRound}
-          onClick={() => handleSubmit("loss")}
-        >
-          It's a loss
-        </button>
-
-        <button
-          className="bg-gray-400 border px-4 py-2 rounded text-white hover:bg-gray-300"
+          className="px-4 py-2 text-white bg-gray-400 border rounded hover:bg-gray-300"
           onClick={() => handleReset()}
         >
           Reset
         </button>
       </div>
 
-      {data?.participants ? (
-        <table className="table-fixed">
-          <thead>
-            <tr>
-              <th className="text-left w-2/12">Participant</th>
-              <th className="text-left w-1/12">Group</th>
-              <th className="text-left w-1/12">Round #1</th>
-              <th className="text-left w-1/12">Round #2</th>
-              <th className="text-left w-1/12">Round #3</th>
-              <th className="text-left w-1/12">Round #4</th>
-              <th className="text-left w-1/12">Balance</th>
+      <table className="table-fixed">
+        <thead>
+          <tr>
+            <th className="w-2/12 text-left">Participant</th>
+            <th className="w-1/12 text-left">Group</th>
+            <th className="w-1/12 text-left">Round #1</th>
+            <th className="w-1/12 text-left">Round #2</th>
+            <th className="w-1/12 text-left">Round #3</th>
+            <th className="w-1/12 text-left">Round #4</th>
+            <th className="w-1/12 text-left">Balance</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {data?.participants.map((participant) => (
+            <tr key={participant._id}>
+              <td>{participant._id}</td>
+              <td>{participant.group}</td>
+              <td>{participant.bets[0]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[1]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[2]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[3]?.amount.toFixed(2)}</td>
+              <td>{participant.balance.toFixed(2)}</td>
             </tr>
-          </thead>
-
-          <tbody>
-            {data?.participants.map((participant) => {
-              const roundOne = participant.bets.find((b) => b.round === 1);
-              const roundTwo = participant.bets.find((b) => b.round === 2);
-              const roundThree = participant.bets.find((b) => b.round === 3);
-              const roundFour = participant.bets.find((b) => b.round === 4);
-
-              return (
-                <tr key={participant.pid}>
-                  <td>{participant.pid}</td>
-                  <td>{participant.group}</td>
-                  <td>{roundOne?.amount}</td>
-                  <td>{roundTwo?.amount}</td>
-                  <td>{roundThree?.amount}</td>
-                  <td>{roundFour?.amount}</td>
-                  <td>{participant.balance}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      ) : (
-        <span>Loading...</span>
-      )}
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
