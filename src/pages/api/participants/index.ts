@@ -1,12 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import ParticipantModel from "../../../models/participant";
-import {
-  BetOutcome,
-  Participant,
-  ParticipantGroup,
-} from "../../../types/participants";
-import { round } from "../../../utils/math";
+import { Participant, ParticipantGroup } from "../../../types/participants";
 
 const ALLOWED_METHODS = ["DELETE", "GET", "POST"];
 
@@ -31,23 +26,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const { amount } = req.body;
-  const outcome = Math.random() < 1 / 6 ? BetOutcome.WIN : BetOutcome.LOSS;
-
-  const balance =
-    outcome === BetOutcome.LOSS ? round(20 - amount) : round(20 + amount * 7);
-
   const group =
     Math.random() < 0.5 ? ParticipantGroup.PAPER : ParticipantGroup.REALIZATION;
 
-  const participant: Omit<Participant, "_id"> = {
-    balance,
-    bets: [
-      {
-        amount,
-        outcome,
-      },
-    ],
+  const participant: Omit<Participant, "_id" | "bets"> = {
+    balance: 20,
     group,
   };
 

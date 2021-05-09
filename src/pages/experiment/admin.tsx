@@ -33,7 +33,7 @@ const ExperimentAdminPage = () => {
   }
 
   return (
-    <div className="p-8">
+    <div className="py-8">
       <div className="flex mb-4 space-x-2">
         <button
           className="px-4 py-2 text-white bg-gray-400 border rounded hover:bg-gray-300"
@@ -48,6 +48,7 @@ const ExperimentAdminPage = () => {
           <tr>
             <th className="w-2/12 text-left">Participant</th>
             <th className="w-1/12 text-left">Group</th>
+            <th className="w-1/12 text-left">Risk averse?</th>
             <th className="w-1/12 text-left">Round #1</th>
             <th className="w-1/12 text-left">Round #2</th>
             <th className="w-1/12 text-left">Round #3</th>
@@ -61,6 +62,7 @@ const ExperimentAdminPage = () => {
             <tr key={participant._id}>
               <td>{participant._id}</td>
               <td>{participant.group}</td>
+              <td>{participant.isRiskAverse ? "Yes" : "No"}</td>
               <td>{participant.bets[0]?.amount.toFixed(2)}</td>
               <td>{participant.bets[1]?.amount.toFixed(2)}</td>
               <td>{participant.bets[2]?.amount.toFixed(2)}</td>

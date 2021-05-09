@@ -21,18 +21,25 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const { amount } = req.body;
-  const outcome = Math.random() < 1 / 6 ? BetOutcome.WIN : BetOutcome.LOSS;
+  const { amount, isRiskAverse } = req.body;
 
-  participant.bets.push({
-    amount,
-    outcome,
-  });
+  if (amount) {
+    const outcome = Math.random() < 1 / 6 ? BetOutcome.WIN : BetOutcome.LOSS;
 
-  if (outcome === BetOutcome.LOSS) {
-    participant.balance = round(participant.balance - amount);
-  } else {
-    participant.balance = round(participant.balance + amount * 7);
+    participant.bets.push({
+      amount,
+      outcome,
+    });
+
+    if (outcome === BetOutcome.LOSS) {
+      participant.balance = round(participant.balance - amount);
+    } else {
+      participant.balance = round(participant.balance + amount * 7);
+    }
+  }
+
+  if (isRiskAverse) {
+    participant.isRiskAverse = isRiskAverse;
   }
 
   const result = await participant.save();

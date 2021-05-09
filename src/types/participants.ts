@@ -18,4 +18,5 @@ export type Participant = {
   balance: number;
   bets: Bet[];
   group: ParticipantGroup;
+  isRiskAverse?: boolean;
 };

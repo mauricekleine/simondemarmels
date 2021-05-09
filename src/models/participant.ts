@@ -31,6 +31,11 @@ const participantSchema = new Schema({
     required: true,
     type: String,
   },
+  isRiskAverse: {
+    default: false,
+    required: true,
+    type: Boolean,
+  },
 });
 
 const ParticipantModel: Model<ParticipantDocument> =
