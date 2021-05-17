@@ -16,12 +16,12 @@ const ExperimentAdminPage = () => {
     const isConfirmed = confirm("Are you sure? This cannot be undone.");
 
     if (isConfirmed) {
-      await fetch("/api/experiment/reset", {
+      await fetch("/api/participants", {
         credentials: "same-origin",
         headers: {
           ["Content-Type"]: "application/json",
         },
-        method: "POST",
+        method: "DELETE",
       });
 
       mutate();
@@ -46,28 +46,38 @@ const ExperimentAdminPage = () => {
       <table className="table-fixed">
         <thead>
           <tr>
-            <th className="w-2/12 text-left">Participant</th>
-            <th className="w-1/12 text-left">Group</th>
-            <th className="w-1/12 text-left">Risk averse?</th>
-            <th className="w-1/12 text-left">Round #1</th>
-            <th className="w-1/12 text-left">Round #2</th>
-            <th className="w-1/12 text-left">Round #3</th>
-            <th className="w-1/12 text-left">Round #4</th>
-            <th className="w-1/12 text-left">Balance</th>
+            <th className="w-1/12 text-xs text-left">Participant</th>
+            <th className="w-1/12 text-xs text-left">Group</th>
+            <th className="w-1/12 text-xs text-left">Risk averse?</th>
+            <th className="w-1/12 text-xs text-left">Round #1</th>
+            <th className="w-1/12 text-xs text-left">Round #2</th>
+            <th className="w-1/12 text-xs text-left">Round #3</th>
+            <th className="w-1/12 text-xs text-left">Round #4</th>
+            <th className="w-1/12 text-xs text-left">Balance</th>
           </tr>
         </thead>
 
         <tbody>
-          {data?.participants.map((participant) => (
+          {data?.participants.map((participant, index) => (
             <tr key={participant._id}>
-              <td>{participant._id}</td>
-              <td>{participant.group}</td>
-              <td>{participant.isRiskAverse ? "Yes" : "No"}</td>
-              <td>{participant.bets[0]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[1]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[2]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[3]?.amount.toFixed(2)}</td>
-              <td>{participant.balance.toFixed(2)}</td>
+              <td className="text-xs">{index}</td>
+              <td className="text-xs">{participant.group}</td>
+              <td className="text-xs">
+                {participant.isRiskAverse ? "Yes" : "No"}
+              </td>
+              <td className="text-xs">
+                {participant.bets[0]?.amount.toFixed(2)}
+              </td>
+              <td className="text-xs">
+                {participant.bets[1]?.amount.toFixed(2)}
+              </td>
+              <td className="text-xs">
+                {participant.bets[2]?.amount.toFixed(2)}
+              </td>
+              <td className="text-xs">
+                {participant.bets[3]?.amount.toFixed(2)}
+              </td>
+              <td className="text-xs">{participant.balance.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
