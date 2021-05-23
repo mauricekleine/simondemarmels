@@ -20,8 +20,12 @@ const App = ({ Component, pageProps }: AppProps) => {
     const isRoundsPage = router.pathname === "/experiment/rounds";
     const isQuestionsPage = router.pathname === "/experiment/questions";
 
+    if (router.pathname.includes("admin")) {
+      return;
+    }
+
     if (!participant && !isStartPage) {
-      router.replace("/experiment");
+      router.replace("/");
       return;
     }
 
