@@ -14,6 +14,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   const { id } = req.query as { id: string };
+
+  if (!id) {
+    res.status(400).end();
+    return;
+  }
+
   const participant = await ParticipantModel.findById(id);
 
   if (req.method === "GET") {
@@ -21,7 +27,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const { amount, isRiskAverse } = req.body;
+  const {
+    age,
+    amount,
+    gender,
+    probabilityOne,
+    probabilityThree,
+    probabilityTwo,
+    riskLevel,
+  } = req.body;
+
+  console.log(req.body);
 
   if (amount) {
     const outcome = Math.random() < 1 / 6 ? BetOutcome.WIN : BetOutcome.LOSS;
@@ -38,8 +54,32 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
   }
 
-  if (isRiskAverse) {
-    participant.isRiskAverse = isRiskAverse;
+  if (!participant.questions) {
+    participant.questions = {};
+  }
+
+  if (age) {
+    participant.questions.age = age;
+  }
+
+  if (gender) {
+    participant.questions.gender = gender;
+  }
+
+  if (probabilityOne) {
+    participant.questions.probabilityOne = probabilityOne;
+  }
+
+  if (probabilityTwo) {
+    participant.questions.probabilityTwo = probabilityTwo;
+  }
+
+  if (probabilityThree) {
+    participant.questions.probabilityThree = probabilityThree;
+  }
+
+  if (riskLevel) {
+    participant.questions.riskLevel = riskLevel;
   }
 
   const result = await participant.save();

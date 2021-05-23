@@ -6,9 +6,9 @@ import fetcher from "../../utils/fetcher";
 const ExperimentAdminPage = () => {
   const { data, mutate } = useSWR<{ participants: Participant[] }>(
     "/api/participants",
-    fetcher,
+    fetcher.get,
     {
-      refreshInterval: 1000,
+      refreshInterval: 2000,
     }
   );
 
@@ -33,7 +33,7 @@ const ExperimentAdminPage = () => {
   }
 
   return (
-    <div className="py-8">
+    <div className="w-screen py-8 mx-8">
       <div className="flex mb-4 space-x-2">
         <button
           className="px-4 py-2 text-white bg-gray-400 border rounded hover:bg-gray-300"
@@ -43,41 +43,55 @@ const ExperimentAdminPage = () => {
         </button>
       </div>
 
-      <table className="table-fixed">
+      <table className="text-xs table-fixed">
         <thead>
           <tr>
-            <th className="w-1/12 text-xs text-left">Participant</th>
-            <th className="w-1/12 text-xs text-left">Group</th>
-            <th className="w-1/12 text-xs text-left">Risk averse?</th>
-            <th className="w-1/12 text-xs text-left">Round #1</th>
-            <th className="w-1/12 text-xs text-left">Round #2</th>
-            <th className="w-1/12 text-xs text-left">Round #3</th>
-            <th className="w-1/12 text-xs text-left">Round #4</th>
-            <th className="w-1/12 text-xs text-left">Balance</th>
+            <th>Participant</th>
+            <th>Group</th>
+            <th>Round #1</th>
+            <th></th>
+            <th>Round #2</th>
+            <th></th>
+            <th>Round #3</th>
+            <th></th>
+            <th>Round #4</th>
+            <th></th>
+            <th>Balance</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Risk level</th>
+            <th>Question #1</th>
+            <th>Question #2</th>
+            <th>Question #3</th>
           </tr>
         </thead>
 
         <tbody>
           {data?.participants.map((participant, index) => (
             <tr key={participant._id}>
-              <td className="text-xs">{index}</td>
-              <td className="text-xs">{participant.group}</td>
-              <td className="text-xs">
-                {participant.isRiskAverse ? "Yes" : "No"}
+              <td>{index}</td>
+              <td>{participant.group}</td>
+              <td>{participant.bets[0]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[0]?.outcome}</td>
+              <td>{participant.bets[1]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[1]?.outcome}</td>
+              <td>{participant.bets[2]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[2]?.outcome}</td>
+              <td>{participant.bets[3]?.amount.toFixed(2)}</td>
+              <td>{participant.bets[3]?.outcome}</td>
+              <td>{participant.balance.toFixed(2)}</td>
+              <td>{participant.questions?.age}</td>
+              <td>{participant.questions?.gender}</td>
+              <td>{participant.questions?.riskLevel}</td>
+              <td>
+                {participant.questions?.probabilityOne.toString().concat("%")}
               </td>
-              <td className="text-xs">
-                {participant.bets[0]?.amount.toFixed(2)}
+              <td>
+                {participant.questions?.probabilityTwo.toString().concat("%")}
               </td>
-              <td className="text-xs">
-                {participant.bets[1]?.amount.toFixed(2)}
+              <td>
+                {participant.questions?.probabilityThree.toString().concat("%")}
               </td>
-              <td className="text-xs">
-                {participant.bets[2]?.amount.toFixed(2)}
-              </td>
-              <td className="text-xs">
-                {participant.bets[3]?.amount.toFixed(2)}
-              </td>
-              <td className="text-xs">{participant.balance.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>

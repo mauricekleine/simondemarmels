@@ -8,6 +8,11 @@ export type Bet = {
   outcome: BetOutcome;
 };
 
+export enum Gender {
+  FEMALE = "FEMALE",
+  MALE = "MALE",
+}
+
 export enum ParticipantGroup {
   PAPER = "PAPER",
   REALIZATION = "REALIZATION",
@@ -19,4 +24,12 @@ export type Participant = {
   bets: Bet[];
   group: ParticipantGroup;
   isRiskAverse?: boolean;
+  questions: {
+    age?: number;
+    gender?: Gender;
+    probabilityOne?: number;
+    probabilityThree?: number;
+    probabilityTwo?: number;
+    riskLevel?: number;
+  };
 };

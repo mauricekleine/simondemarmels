@@ -2,6 +2,7 @@ import { Document, Model, Schema, model, models } from "mongoose";
 
 import {
   BetOutcome,
+  Gender,
   Participant,
   ParticipantGroup,
 } from "../types/participants";
@@ -22,6 +23,15 @@ const betSchema = new Schema({
   },
 });
 
+const questionsSchema = new Schema({
+  age: { type: Number },
+  gender: { enum: Gender, type: String },
+  probabilityOne: { type: Number },
+  probabilityThree: { type: Number },
+  probabilityTwo: { type: Number },
+  riskLevel: { type: Number },
+});
+
 const participantSchema = new Schema({
   balance: { default: 20, required: true, type: Number },
   bets: [betSchema],
@@ -31,11 +41,7 @@ const participantSchema = new Schema({
     required: true,
     type: String,
   },
-  isRiskAverse: {
-    default: false,
-    required: true,
-    type: Boolean,
-  },
+  questions: questionsSchema,
 });
 
 const ParticipantModel: Model<ParticipantDocument> =

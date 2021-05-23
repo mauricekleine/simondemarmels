@@ -1,9 +1,8 @@
-import { useRouter } from "next/dist/client/router";
 import Slider, { SliderTooltip } from "rc-slider";
-import { useCallback, useEffect, useState } from "react";
-import useSWR from "swr";
+import { useCallback, useState } from "react";
 
 import Button from "../../components/button";
+import useParticipant from "../../hooks/participant.hook";
 import { Participant, ParticipantGroup } from "../../types/participants";
 import fetcher from "../../utils/fetcher";
 import { round } from "../../utils/math";
@@ -27,37 +26,11 @@ const handle = (props) => {
 };
 
 const ExperimentPage = () => {
-  const router = useRouter();
-  const [id, setId] = useState(null);
+  const { mutate, participant } = useParticipant();
+
   const [amount, setAmount] = useState(0);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-
-  useEffect(() => {
-    const id = localStorage.getItem("id");
-
-    if (id) {
-      setId(id);
-    } else {
-      router.replace("/experiment/start");
-    }
-  }, [router, setId]);
-
-  const { data, mutate } = useSWR<{ participant: Participant }>(
-    id ? `/api/participants/${id}` : null,
-    fetcher
-  );
-
-  const participant = id && data?.participant;
-
-  useEffect(() => {
-    if (!participant) {
-      return;
-    }
-
-    if (participant?.bets.length === 4) {
-      router.push("/experiment/last");
-    }
-  }, [participant, router]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSlider = useCallback(
     (value: number) => {
@@ -67,32 +40,35 @@ const ExperimentPage = () => {
   );
 
   const handleSubmit = useCallback(async () => {
-    const response = await fetch(`/api/participants/${id}`, {
-      body: JSON.stringify({
-        amount,
-      }),
-      headers: {
-        ["Content-Type"]: "application/json",
-      },
-      method: "PATCH",
-    });
+    setIsLoading(true);
 
-    const data = (await response.json()) as {
-      participant: Participant;
-    };
+    try {
+      const data = await fetcher.patch<{
+        participant: Participant;
+      }>(`/api/participants/current`, {
+        body: JSON.stringify({
+          amount,
+        }),
+      });
 
-    localStorage.setItem("id", data.participant._id);
-    mutate(data);
-    setAmount(0);
-    setHasSubmitted(true);
-    setId(data.participant._id);
-  }, [amount, id, mutate]);
+      mutate(data);
+      setAmount(0);
+      setHasSubmitted(participant.bets.length !== 4);
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+    }
+  }, [amount, mutate, participant]);
+
+  if (!participant) {
+    return <span>Loading...</span>;
+  }
 
   if (hasSubmitted) {
     const isRealizationGroup =
-      participant?.group === ParticipantGroup.REALIZATION;
-    const isThirdBet = participant?.bets.length === 3;
-    const lastOutcome = participant?.bets[participant?.bets.length - 1].outcome;
+      participant.group === ParticipantGroup.REALIZATION;
+    const isThirdBet = participant.bets.length === 3;
+    const lastOutcome = participant.bets[participant.bets.length - 1].outcome;
 
     return (
       <div className="flex flex-col items-center justify-center w-full h-screen text-center">
@@ -104,28 +80,28 @@ const ExperimentPage = () => {
         {isThirdBet && !isRealizationGroup && (
           <p>
             Your account has been settled. Your remaining balance is €
-            {round(data.participant.balance).toFixed(2)}.
+            {round(participant.balance).toFixed(2)}.
           </p>
         )}
 
         {isThirdBet && isRealizationGroup && (
           <>
             <p>
-              {participant?.balance > 20 && (
+              {participant.balance > 20 && (
                 <span>
                   So far, you&apos;ve earned €
-                  {round(participant?.balance - 20).toFixed(2)}.
+                  {round(participant.balance - 20).toFixed(2)}.
                 </span>
               )}
 
-              {participant?.balance < 20 && (
+              {participant.balance < 20 && (
                 <span>
                   So far, you&apos;ve lost €
-                  {round(20 - participant?.balance).toFixed(2)}.
+                  {round(20 - participant.balance).toFixed(2)}.
                 </span>
               )}
 
-              {participant?.balance === 20 && (
+              {participant.balance === 20 && (
                 <span>So far, you haven&apos;t earned or lost any money.</span>
               )}
             </p>
@@ -147,7 +123,7 @@ const ExperimentPage = () => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-screen space-y-8">
       <p className="text-lg font-bold text-center">
-        Round {participant?.bets.length + 1}
+        Round {participant.bets.length + 1}
       </p>
 
       <div className="w-full">
@@ -177,7 +153,9 @@ const ExperimentPage = () => {
 
       <p>Your bet: €{amount.toFixed(2)}</p>
 
-      <Button onClick={handleSubmit}>Place bet</Button>
+      <Button isLoading={isLoading} onClick={handleSubmit}>
+        Place bet
+      </Button>
     </div>
   );
 };
