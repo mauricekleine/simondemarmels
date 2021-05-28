@@ -84,13 +84,15 @@ const ExperimentAdminPage = () => {
               <td>{participant.questions?.gender}</td>
               <td>{participant.questions?.riskLevel}</td>
               <td>
-                {participant.questions?.probabilityOne.toString().concat("%")}
+                {participant.questions?.probabilityOne?.toString().concat("%")}
               </td>
               <td>
-                {participant.questions?.probabilityTwo.toString().concat("%")}
+                {participant.questions?.probabilityTwo?.toString().concat("%")}
               </td>
               <td>
-                {participant.questions?.probabilityThree.toString().concat("%")}
+                {participant.questions?.probabilityThree
+                  ?.toString()
+                  .concat("%")}
               </td>
             </tr>
           ))}
