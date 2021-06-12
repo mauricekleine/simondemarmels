@@ -35,9 +35,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     probabilityThree,
     probabilityTwo,
     riskLevel,
+    strategy,
   } = req.body;
-
-  console.log(req.body);
 
   if (amount) {
     const outcome = Math.random() < 1 / 6 ? BetOutcome.WIN : BetOutcome.LOSS;
@@ -80,6 +79,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (riskLevel) {
     participant.questions.riskLevel = riskLevel;
+  }
+
+  if (strategy) {
+    participant.strategy = strategy;
   }
 
   const result = await participant.save();

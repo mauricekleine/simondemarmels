@@ -32,4 +32,13 @@ export type Participant = {
     probabilityTwo?: number;
     riskLevel?: number;
   };
+  strategy: {
+    roundFourBetLoss: number;
+    roundFourBetWin: number;
+    roundOneBet: number;
+    roundThreeBetLoss: number;
+    roundThreeBetWin: number;
+    roundTwoBetLoss: number;
+    roundTwoBetWin: number;
+  };
 };

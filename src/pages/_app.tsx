@@ -18,6 +18,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     const isStartPage = !router.pathname.startsWith("/experiment");
     const isRoundsPage = router.pathname === "/experiment/rounds";
+    const isStrategyPage = router.pathname === "/experiment/strategy";
     const isQuestionsPage = router.pathname === "/experiment/questions";
 
     if (router.pathname.includes("admin")) {
@@ -30,6 +31,11 @@ const App = ({ Component, pageProps }: AppProps) => {
     }
 
     if (participant && isStartPage) {
+      if (!participant.strategy) {
+        router.replace("/experiment/strategy");
+        return;
+      }
+
       if (participant.bets.length === 4) {
         router.replace("/experiment/questions");
         return;
@@ -39,7 +45,24 @@ const App = ({ Component, pageProps }: AppProps) => {
       }
     }
 
+    if (participant && isStrategyPage) {
+      if (participant.strategy) {
+        if (participant.bets.length === 4) {
+          router.replace("/experiment/questions");
+          return;
+        } else {
+          router.replace("/experiment/rounds");
+          return;
+        }
+      }
+    }
+
     if (participant && isRoundsPage) {
+      if (!participant.strategy) {
+        router.replace("/experiment/strategy");
+        return;
+      }
+
       if (participant.bets.length === 4) {
         router.replace("/experiment/questions");
         return;
@@ -47,6 +70,11 @@ const App = ({ Component, pageProps }: AppProps) => {
     }
 
     if (participant && isQuestionsPage) {
+      if (!participant.strategy) {
+        router.replace("/experiment/strategy");
+        return;
+      }
+
       if (participant.bets.length !== 4) {
         router.replace("/experiment/rounds");
         return;

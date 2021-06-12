@@ -32,6 +32,16 @@ const questionsSchema = new Schema({
   riskLevel: { type: Number },
 });
 
+const strategySchema = new Schema({
+  roundFourBetLoss: { type: Number },
+  roundFourBetWin: { type: Number },
+  roundOneBet: { type: Number },
+  roundThreeBetLoss: { type: Number },
+  roundThreeBetWin: { type: Number },
+  roundTwoBetLoss: { type: Number },
+  roundTwoBetWin: { type: Number },
+});
+
 const participantSchema = new Schema({
   balance: { default: 20, required: true, type: Number },
   bets: [betSchema],
@@ -42,6 +52,7 @@ const participantSchema = new Schema({
     type: String,
   },
   questions: questionsSchema,
+  strategy: strategySchema,
 });
 
 const ParticipantModel: Model<ParticipantDocument> =

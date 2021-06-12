@@ -43,61 +43,101 @@ const ExperimentAdminPage = () => {
         </button>
       </div>
 
-      <table className="text-xs table-fixed">
-        <thead>
-          <tr>
-            <th>Participant</th>
-            <th>Group</th>
-            <th>Round #1</th>
-            <th></th>
-            <th>Round #2</th>
-            <th></th>
-            <th>Round #3</th>
-            <th></th>
-            <th>Round #4</th>
-            <th></th>
-            <th>Balance</th>
-            <th>Age</th>
-            <th>Gender</th>
-            <th>Risk level</th>
-            <th>Question #1</th>
-            <th>Question #2</th>
-            <th>Question #3</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {data?.participants.map((participant, index) => (
-            <tr key={participant._id}>
-              <td>{index}</td>
-              <td>{participant.group}</td>
-              <td>{participant.bets[0]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[0]?.outcome}</td>
-              <td>{participant.bets[1]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[1]?.outcome}</td>
-              <td>{participant.bets[2]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[2]?.outcome}</td>
-              <td>{participant.bets[3]?.amount.toFixed(2)}</td>
-              <td>{participant.bets[3]?.outcome}</td>
-              <td>{participant.balance.toFixed(2)}</td>
-              <td>{participant.questions?.age}</td>
-              <td>{participant.questions?.gender}</td>
-              <td>{participant.questions?.riskLevel}</td>
-              <td>
-                {participant.questions?.probabilityOne?.toString().concat("%")}
-              </td>
-              <td>
-                {participant.questions?.probabilityTwo?.toString().concat("%")}
-              </td>
-              <td>
-                {participant.questions?.probabilityThree
-                  ?.toString()
-                  .concat("%")}
-              </td>
+      <div className="overflow-x-scroll">
+        <table className="overflow-x-scroll text-xs table-fixed">
+          <thead>
+            <tr>
+              <th className="w-1/12">Participant</th>
+              <th className="w-1/12">Group</th>
+              <th className="w-1/12">S: Round #1</th>
+              <th className="w-1/12">S: Round #2 - loss</th>
+              <th className="w-1/12">S: Round #2 - win</th>
+              <th className="w-1/12">S: Round #3 - loss</th>
+              <th className="w-1/12">S: Round #3 - win</th>
+              <th className="w-1/12">S: Round #4 - loss</th>
+              <th className="w-1/12">S: Round #4 - win</th>
+              <th className="w-1/12">Round #1</th>
+              <th className="w-1/12"></th>
+              <th className="w-1/12">Round #2</th>
+              <th className="w-1/12"></th>
+              <th className="w-1/12">Round #3</th>
+              <th className="w-1/12"></th>
+              <th className="w-1/12">Round #4</th>
+              <th className="w-1/12"></th>
+              <th className="w-1/12">Balance</th>
+              <th className="w-1/12">Age</th>
+              <th className="w-1/12">Gender</th>
+              <th className="w-1/12">Risk level</th>
+              <th className="w-1/12">Question #1</th>
+              <th className="w-1/12">Question #2</th>
+              <th className="w-1/12">Question #3</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {data?.participants.map((participant, index) => (
+              <tr key={participant._id}>
+                <td className="w-1/12">{index}</td>
+                <td className="w-1/12">{participant.group}</td>
+                <td className="w-1/12">{participant.strategy?.roundOneBet}</td>
+                <td className="w-1/12">
+                  {participant.strategy?.roundTwoBetLoss}
+                </td>
+                <td className="w-1/12">
+                  {participant.strategy?.roundTwoBetWin}
+                </td>
+                <td className="w-1/12">
+                  {participant.strategy?.roundThreeBetLoss}
+                </td>
+                <td className="w-1/12">
+                  {participant.strategy?.roundThreeBetWin}
+                </td>
+                <td className="w-1/12">
+                  {participant.strategy?.roundFourBetLoss}
+                </td>
+                <td className="w-1/12">
+                  {participant.strategy?.roundFourBetWin}
+                </td>
+                <td className="w-1/12">
+                  {participant.bets[0]?.amount.toFixed(2)}
+                </td>
+                <td className="w-1/12">{participant.bets[0]?.outcome}</td>
+                <td className="w-1/12">
+                  {participant.bets[1]?.amount.toFixed(2)}
+                </td>
+                <td className="w-1/12">{participant.bets[1]?.outcome}</td>
+                <td className="w-1/12">
+                  {participant.bets[2]?.amount.toFixed(2)}
+                </td>
+                <td className="w-1/12">{participant.bets[2]?.outcome}</td>
+                <td className="w-1/12">
+                  {participant.bets[3]?.amount.toFixed(2)}
+                </td>
+                <td className="w-1/12">{participant.bets[3]?.outcome}</td>
+                <td className="w-1/12">{participant.balance.toFixed(2)}</td>
+                <td className="w-1/12">{participant.questions?.age}</td>
+                <td className="w-1/12">{participant.questions?.gender}</td>
+                <td className="w-1/12">{participant.questions?.riskLevel}</td>
+                <td className="w-1/12">
+                  {participant.questions?.probabilityOne
+                    ?.toString()
+                    .concat("%")}
+                </td>
+                <td className="w-1/12">
+                  {participant.questions?.probabilityTwo
+                    ?.toString()
+                    .concat("%")}
+                </td>
+                <td className="w-1/12">
+                  {participant.questions?.probabilityThree
+                    ?.toString()
+                    .concat("%")}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
