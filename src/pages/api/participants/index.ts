@@ -29,7 +29,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const group =
     Math.random() < 0.5 ? ParticipantGroup.PAPER : ParticipantGroup.REALIZATION;
 
-  const participant: Omit<Participant, "_id" | "bets" | "questions"> = {
+  const participant: Omit<
+    Participant,
+    "_id" | "bets" | "questions" | "strategy"
+  > = {
     balance: 20,
     group,
   };
