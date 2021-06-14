@@ -113,7 +113,21 @@ const StrategyPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
-      <div>Please submit your contigent investment strategy</div>
+      <div className="space-x-1">
+        <p>
+          Before you begin playing the game, please enter your planned
+          investment strategy on the sliders below. For example, you will see
+          sliders asking you what you plan to invest in each round given the
+          previous round was either a win or a loss.
+        </p>
+
+        <p>
+          Simply indicate your planned investment for each case on each of the
+          seven sliders below by dragging the dot across the bar or clicking on
+          a number. After you are done, you can proceed onward and make your
+          actual investments in the game.
+        </p>
+      </div>
 
       <div className="w-full">
         <p className="text-lg font-bold">Round one</p>
